@@ -71,7 +71,11 @@ class Export extends Module{
 					break;
 				
 				case "selected":
-					rows = this.table.modules.selectRow.selectedRows;
+					if(this.table.modules.selectRow && this.table.options.selectable !== "highlight"){
+						rows = this.table.modules.selectRow.selectedRows;
+					}else if (this.table.modules.selectCell && this.table.options.selectableCells !== "highlight"){
+						rows = this.table.modules.selectCell.selectedRows;
+					}
 					break;
 				
 				case "active":
@@ -232,11 +236,16 @@ class Export extends Module{
 		var columns = [];
 		var exportRows = [];
 		
-		this.table.columnManager.columnsByIndex.forEach((column) => {
-			if (this.columnVisCheck(column)) {
-				columns.push(column.getComponent());
-			}
-		});
+		if(this.table.options.clipboardCopyColumnRange === "active"){
+			this.table.columnManager.columnsByIndex.forEach((column) => {
+				if (this.columnVisCheck(column)) {
+					columns.push(column.getComponent());
+				}
+			});
+		}else if(this.table.modules.selectCell && this.table.options.clipboardCopyColumnRange === "selected"){
+			console.log("selected columns");
+			columns = this.table.modules.selectCell.selectedColumns.map((column) => column.getComponent());
+		}
 		
 		if(this.config.columnCalcs !== false && this.table.modExists("columnCalcs")){
 			if(this.table.modules.columnCalcs.topInitialized){

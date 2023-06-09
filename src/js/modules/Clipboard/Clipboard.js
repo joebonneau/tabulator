@@ -20,6 +20,7 @@ class Clipboard extends Module{
 		this.registerTableOption("clipboardCopyConfig", false); //clipboard config
 		this.registerTableOption("clipboardCopyFormatter", false); //DEPRECATED - REMOVE in 5.0
 		this.registerTableOption("clipboardCopyRowRange", "active"); //restrict clipboard to visible rows only
+		this.registerTableOption("clipboardCopyColumnRange", "active"); //restrict clipboard to visible columns only
 		this.registerTableOption("clipboardPasteParser", "table"); //convert pasted clipboard data to rows
 		this.registerTableOption("clipboardPasteAction", "insert"); //how to insert pasted data into the table
 
@@ -35,7 +36,7 @@ class Clipboard extends Module{
 		if(this.mode === true || this.mode === "copy"){
 			this.table.element.addEventListener("copy", (e) => {
 				var plain, html, list;
-
+				
 				if(!this.blocked){
 					e.preventDefault();
 
@@ -81,6 +82,7 @@ class Clipboard extends Module{
 
 		if(this.mode === true || this.mode === "paste"){
 			this.table.element.addEventListener("paste", (e) => {
+				console.log("paste event", e);
 				this.paste(e);
 			});
 		}
@@ -150,7 +152,9 @@ class Clipboard extends Module{
 			if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
 				range = document.createRange();
 				range.selectNodeContents(this.table.element);
+				console.log("copy range", range);
 				sel = window.getSelection();
+				console.log("copy selection", sel);
 
 				if (sel.toString() && internal) {
 					this.customSelection = sel.toString();
@@ -208,6 +212,7 @@ class Clipboard extends Module{
 
 	paste(e){
 		var data, rowData, rows;
+		console.log("paste - here");
 
 		if(this.checkPaseOrigin(e)){
 
@@ -247,6 +252,7 @@ class Clipboard extends Module{
 
 
 	checkPaseOrigin(e){
+		console.log("checkPaseOrigin - here");
 		var valid = true;
 
 		if(e.target.tagName != "DIV" || this.table.modules.edit.currentCell){
@@ -257,6 +263,7 @@ class Clipboard extends Module{
 	}
 
 	getPasteData(e){
+		console.log("getPasteData - here");
 		var data;
 
 		if (window.clipboardData && window.clipboardData.getData) {

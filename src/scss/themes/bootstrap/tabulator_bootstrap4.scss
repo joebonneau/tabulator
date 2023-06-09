@@ -476,6 +476,14 @@ $table-cell-padding-sm: 5px;
 				}
 			}
 		}
+
+		&.tabulator-selectable.tabulator-selected{
+			background-color: $rowSelectedBackground;
+		}
+
+		&.tabulator-selectable.tabulator-selected:hover{
+			background-color: $rowSelectedBackgroundHover;
+		}
 	}
 
 	&.tabulator-group{

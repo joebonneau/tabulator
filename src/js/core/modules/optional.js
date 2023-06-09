@@ -29,6 +29,7 @@ export {default as ResizeColumnsModule} from '../../modules/ResizeColumns/Resize
 export {default as ResizeRowsModule} from '../../modules/ResizeRows/ResizeRows.js';
 export {default as ResizeTableModule} from '../../modules/ResizeTable/ResizeTable.js';
 export {default as ResponsiveLayoutModule} from '../../modules/ResponsiveLayout/ResponsiveLayout.js';
+export {default as SelectCellModule} from '../../modules/SelectCell/SelectCell.js';
 export {default as SelectRowModule} from '../../modules/SelectRow/SelectRow.js';
 export {default as SortModule} from '../../modules/Sort/Sort.js';
 export {default as TooltipModule} from '../../modules/Tooltip/Tooltip.js';
