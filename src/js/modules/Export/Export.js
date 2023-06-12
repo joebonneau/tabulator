@@ -35,9 +35,16 @@ class Export extends Module{
 		this.cloneTableStyle = style;
 		this.config = config || {};
 		this.colVisProp = colVisProp;
+		console.log("generateExportList range", range);
 		
 		var headers = this.config.columnHeaders !== false ? this.headersToExportRows(this.generateColumnGroupHeaders()) : [];
+		// let body;
 		var body = this.bodyToExportRows(this.rowLookup(range));
+		// if (this.table.options.selectableMode === "cell") {
+		// 	body = this.bodyToExportCells(this.rowLookup(range));
+		// } else {
+		// 	body = this.bodyToExportRows(this.rowLookup(range));
+		// }
 		
 		return headers.concat(body);
 	}
@@ -71,10 +78,14 @@ class Export extends Module{
 					break;
 				
 				case "selected":
-					if(this.table.modules.selectRow && this.table.options.selectable !== "highlight"){
+					console.log("case is selected");
+					console.log("modExists selectCell", this.table.modExists("selectCell"));
+					if(this.table.modExists("selectRow") && this.table.options.selectableComponent === "row" && this.table.options.selectable !== "highlight"){
 						rows = this.table.modules.selectRow.selectedRows;
-					}else if (this.table.modules.selectCell && this.table.options.selectableCells !== "highlight"){
+						console.log("selectRow.selectedRows", rows);
+					}else if (this.table.modExists("selectCell") && this.table.options.selectableComponent === "cell" && this.table.options.selectable !== "highlight"){
 						rows = this.table.modules.selectCell.selectedRows;
+						console.log("selectCell.selectedRows", rows);
 					}
 					break;
 				
@@ -232,7 +243,7 @@ class Export extends Module{
 	}
 	
 	bodyToExportRows(rows){
-		
+		console.log("rows in bodyToExportRows", rows);
 		var columns = [];
 		var exportRows = [];
 		
@@ -243,8 +254,8 @@ class Export extends Module{
 				}
 			});
 		}else if(this.table.modules.selectCell && this.table.options.clipboardCopyColumnRange === "selected"){
-			console.log("selected columns");
 			columns = this.table.modules.selectCell.selectedColumns.map((column) => column.getComponent());
+			console.log("selected columns", columns);
 		}
 		
 		if(this.config.columnCalcs !== false && this.table.modExists("columnCalcs")){
@@ -258,6 +269,7 @@ class Export extends Module{
 		}
 		
 		rows = rows.filter((row) => {
+			console.log(row);
 			switch(row.type){
 				case "group":
 					return this.config.rowGroups !== false;
@@ -276,7 +288,7 @@ class Export extends Module{
 			var rowData = row.getData(this.colVisProp);
 			var exportCols = [];
 			var indent = 0;
-			
+			console.log("row", row);
 			switch(row.type){
 				case "group":
 					indent = row.level;
@@ -297,7 +309,7 @@ class Export extends Module{
 			
 			exportRows.push(new ExportRow(row.type, exportCols, row.getComponent(), indent));
 		});
-		
+		console.log(exportRows);
 		return exportRows;
 	}
 	

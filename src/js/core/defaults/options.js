@@ -45,6 +45,14 @@ export default {
 	scrollToColumnPosition:"left",
 	scrollToColumnIfVisible:true,
 
+	selectable: false,
+	selectableCheck: function(data, component){return true;},
+	selectableComponent: "row",
+	selectableRangeMode: "drag",
+	selectableRollingSelection: false,
+	selectablePersistence: true,
+	
+
 	rowFormatter:false,
 	rowFormatterPrint:null,
 	rowFormatterClipboard:null,

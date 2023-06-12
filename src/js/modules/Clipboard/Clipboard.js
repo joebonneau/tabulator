@@ -49,6 +49,7 @@ class Clipboard extends Module{
 					}else{
 
 						list = this.table.modules.export.generateExportList(this.table.options.clipboardCopyConfig, this.table.options.clipboardCopyStyled, this.rowRange, "clipboard");
+						console.log("list from generateExportList", list);
 
 						html = this.table.modules.export.generateHTMLTable(list);
 						plain = html ? this.generatePlainContent(list) : "";
@@ -72,6 +73,9 @@ class Clipboard extends Module{
 							e.originalEvent.clipboardData.setData('text/html', html);
 						}
 					}
+
+					// TODO: implement default option to deselect cells after copying
+					// if(this.table.modExists("selectCell") && this.table.options.selectable !==)
 
 					this.dispatchExternal("clipboardCopied", plain, html);
 
@@ -217,9 +221,10 @@ class Clipboard extends Module{
 		if(this.checkPaseOrigin(e)){
 
 			data = this.getPasteData(e);
+			console.log("paste data", data);
 
 			rowData = this.pasteParser.call(this, data);
-
+			console.log("rowData from pasteParser", rowData);
 			if(rowData){
 				e.preventDefault();
 

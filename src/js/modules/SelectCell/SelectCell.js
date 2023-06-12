@@ -12,11 +12,12 @@ class SelectCell extends Module {
 		this.selectedRows = [];
 		this.selectedColumns = [];
 
-		this.registerTableOption("selectableCells", "highlight"); // defines whether cells are selectable and how that functions
-		this.registerTableOption("selectableCellsRangeMode", "drag"); // defines how to select a range of cells
-		this.registerTableOption("selectableCellsRollingSelection", false); // defines whether the first cell should be deselected after a certain defined threshold
-		this.registerTableOption("selectableCellsPersistence", true); // defines whether the selection should be persisted when table view is updated
-		this.registerTableOption("selectableCellsCheck", function(data, cell){return true;}); // check whether a cell is selectable
+		// making these default table options
+		// this.registerTableOption("selectableCells", "highlight"); // defines whether cells are selectable and how that functions
+		// this.registerTableOption("selectableCellsRangeMode", "drag"); // defines how to select a range of cells
+		// this.registerTableOption("selectableCellsRollingSelection", false); // defines whether the first cell should be deselected after a certain defined threshold
+		// this.registerTableOption("selectableCellsPersistence", true); // defines whether the selection should be persisted when table view is updated
+		// this.registerTableOption("selectableCellsCheck", function(data, cell){return true;}); // check whether a cell is selectable
 
 		this.registerTableFunction("selectCell", this.selectCells.bind(this));
 		this.registerTableFunction("deselectCell", this.deselectCells.bind(this));
@@ -30,14 +31,14 @@ class SelectCell extends Module {
 	}
 
 	initialize(){
-		if (this.table.options.selectableCells !== false){
+		if (this.table.options.selectable !== false && this.table.options.selectableComponent === "cell"){
 			this.subscribe("cell-init", this.initializeCell.bind(this));
 			this.subscribe("cell-delete", this.cellDeleted.bind(this));
 			// this.subscribe("cells-wipe", this.clearSelectionData.bind(this));
 			// this.subscribe("cells-retrieve", this.cellRetrieve.bind(this));
 		}
 
-		if(this.table.options.selectableCells && !this.table.options.selectableCellsPersistence){
+		if(!this.table.options.selectablePersistence){
 			this.subscribe("data-refreshing", this.deselectCells.bind(this));
 		}
 	}
@@ -83,7 +84,7 @@ class SelectCell extends Module {
 			element.classList.add("tabulator-selectable");
 			element.classList.remove("tabulator-unselectable");
 
-			if(self.table.options.selectableCells && self.table.options.selectableCells !== "highlight"){
+			if(self.table.options.selectable && self.table.options.selectable !== "highlight"){
 				if(self.table.options.selectableRangeMode === "click"){
 					element.addEventListener("click", this.handleComplexCellClick.bind(this, cell));
 				}else{
@@ -156,7 +157,7 @@ class SelectCell extends Module {
 		// 	// return this.table.options.selectableCellsCheck(this.table, cell.getComponent());
 		// }
 		if(cell){
-			return this.table.options.selectableCellsCheck(this.table, cell.getComponent());
+			return this.table.options.selectableCheck(this.table, cell.getComponent());
 		}
 		// if(cell && cell.type == "cell"){
 		// 	return this.table.options.selectableCellsCheck(this.table, cell.getComponent());
@@ -225,6 +226,7 @@ class SelectCell extends Module {
 		// 	}
 		// }
 		console.log("selectedCells", this.selectedCells);
+		console.log("cell.column", cell.column);
 		if(cell && this.selectedCells.indexOf(cell) === -1){
 			cell.getElement().classList.add("tabulator-selected");
 			if(!cell.modules.select){
@@ -240,6 +242,8 @@ class SelectCell extends Module {
 			if(!this.selectedColumns.includes(cell.column)){
 				this.selectedColumns.push(cell.column);
 			}
+			console.log("selectedColumns", this.selectedColumns);
+			console.log("selectedRows", this.selectedRows);
 
 			this.dispatchExternal("cellSelected", cell.getComponent());
 			this._cellSelectionChanged(silent, cell);
@@ -258,7 +262,8 @@ class SelectCell extends Module {
 		const changes = [];
 		let cellMatch = cells;
 		let change;
-
+		console.log("deselectCells", cells);
+		console.log("typeof cells", typeof cells);
 		switch(typeof cells){
 			case "undefined":
 				cellMatch = Object.assign([], this.selectedCells);
@@ -275,14 +280,27 @@ class SelectCell extends Module {
 
 		if(Array.isArray(cellMatch) && cellMatch.length){
 			cellMatch.forEach((cell) => {
-				change = this._deselectCell(cell, true, true);
+				change = this._deselectCell(cell, true);
 				if(change){
 					changes.push(change);
 				}
 			});
+			// this.selectedRows = this.selectedCells.reduce((acc, cell) => {
+			// 	if(!acc.includes(cell.row)){
+			// 		acc.push(cell.row);
+			// 	}
+			// 	return acc;
+			// }, []);
+			// this.selectedColumns = this.selectedCells.reduce((acc, cell) => {
+			// 	if(!acc.includes(cell.column)){
+			// 		acc.push(cell.column);
+			// 	}
+			// 	return acc;
+			// }, []);
+
 			this._cellSelectionChanged(silent, [], changes);
 		}else if(cellMatch){
-			this._deselectCell(cellMatch, silent, true);
+			this._deselectCell(cellMatch, silent);
 		}
 	}
 
@@ -305,6 +323,21 @@ class SelectCell extends Module {
 				}
 				cell.modules.select.selected = false;
 				self.selectedCells.splice(index, 1);
+				self.selectedRows = self.selectedCells.reduce((acc, cell) => {
+					if(!acc.includes(cell.row)){
+						acc.push(cell.row);
+					}
+					return acc;
+				}, []);
+				self.selectedColumns = self.selectedCells.reduce((acc, cell) => {
+					if(!acc.includes(cell.column)){
+						acc.push(cell.column);
+					}
+					return acc;
+				}, []);
+				console.log("selectedColumns", self.selectedColumns);
+				console.log("selectedRows", self.selectedRows);
+				console.log("selectedCells", self.selectedCells);
 				self.dispatchExternal("cellDeselected", cell.getComponent());
 				self._cellSelectionChanged(silent, undefined, cell);
 

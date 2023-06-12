@@ -11,11 +11,12 @@ class SelectRow extends Module{
 		this.selectedRows = []; //hold selected rows
 		this.headerCheckboxElement = null; // hold header select element
 		
-		this.registerTableOption("selectable", "highlight"); //highlight rows on hover
-		this.registerTableOption("selectableRangeMode", "drag");  //highlight rows on hover
-		this.registerTableOption("selectableRollingSelection", true); //roll selection once maximum number of selectable rows is reached
-		this.registerTableOption("selectablePersistence", true); // maintain selection when table view is updated
-		this.registerTableOption("selectableCheck", function(data, row){return true;}); //check whether row is selectable
+		// making these default table options
+		// this.registerTableOption("selectable", "highlight"); //highlight rows on hover
+		// this.registerTableOption("selectableRangeMode", "drag");  //highlight rows on hover
+		// this.registerTableOption("selectableRollingSelection", true); //roll selection once maximum number of selectable rows is reached
+		// this.registerTableOption("selectablePersistence", true); // maintain selection when table view is updated
+		// this.registerTableOption("selectableCheck", function(data, row){return true;}); //check whether row is selectable
 		
 		this.registerTableFunction("selectRow", this.selectRows.bind(this));
 		this.registerTableFunction("deselectRow", this.deselectRows.bind(this));
@@ -31,7 +32,7 @@ class SelectRow extends Module{
 	}
 	
 	initialize(){
-		if(this.table.options.selectable !== false){
+		if(this.table.options.selectable !== false && this.table.options.selectableComponent === "row"){
 			this.subscribe("row-init", this.initializeRow.bind(this));
 			this.subscribe("row-deleting", this.rowDeleted.bind(this));
 			this.subscribe("rows-wipe", this.clearSelectionData.bind(this));

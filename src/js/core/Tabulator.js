@@ -486,18 +486,25 @@ class Tabulator {
 			}
 			
 			if(data && data.length > 0){
+				console.log("data checks out, shouldn't error");
 				data.forEach((item) => {
+					console.log("item", item);
+					console.log("this.options.index", this.options.index);
 					var row = this.rowManager.findRow(item[this.options.index]);
-					
+					console.log(row);
 					responses++;
 					
 					if(row){
 						row.updateData(item)
 							.then(()=>{
+								console.log("row updated");
+								console.log("row", row);
 								responses--;
 								rows.push(row.getComponent());
 							
 								if(!responses){
+									console.log("resolving");
+									console.log("rows", rows);
 									resolve(rows);
 								}
 							});
